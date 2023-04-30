@@ -1,7 +1,8 @@
 import { Order } from '../../src/models'
-import { lastValueFrom, of } from 'rxjs'
+import { Observable, lastValueFrom, of, tap } from 'rxjs'
 import { groupBy } from '../../src/utils'
-import { scanOrders } from '../../src/pipes'
+import { getUserOrdersUpdates, scanOrders } from '../../src/pipes'
+import { Message, MessageType } from '../../src/connection'
 
 let _id = 0
 function id() {
@@ -95,6 +96,59 @@ function testScan() {
       const last = await lastValueFrom(output)
 
       expect(last).toEqual(expected)
+    })
+  })
+
+  describe('get user orders update', () => {
+    test('empty', async () => {
+      const input = of()
+      const output = input.pipe(getUserOrdersUpdates())
+
+      const last = await lastValueFrom(output, { defaultValue: null })
+      expect(last).toEqual(null)
+    })
+
+    test('emit only orders', async () => {
+      const messages: Message[] = [
+        { messageType: MessageType.MyOrders, message: ['1', '2', '3'] },
+      ]
+      const input: Observable<Message> = of(...messages)
+      const output = input.pipe(getUserOrdersUpdates())
+
+      const last = await lastValueFrom(output, { defaultValue: null })
+      expect(last).toEqual(null)
+    })
+
+    test('emit only update', async () => {
+      const messages: Message[] = [
+        {
+          messageType: MessageType.Orders,
+          message: [createOrder().copy({ status: 'filled' }) as any],
+        },
+      ]
+      const input: Observable<Message> = of(...messages)
+      const output = input.pipe(getUserOrdersUpdates())
+
+      const last = await lastValueFrom(output, { defaultValue: null })
+      expect(last).toEqual(null)
+    })
+
+    test('normal', async () => {
+      const messages: Message[] = [
+        {
+          messageType: MessageType.MyOrders,
+          message: ['1'],
+        },
+        {
+          messageType: MessageType.Orders,
+          message: [createOrder().copy({ status: 'filled', id: '1' }) as any],
+        },
+      ]
+      const input: Observable<Message> = of(...messages)
+      const output = input.pipe(getUserOrdersUpdates())
+
+      const last = await lastValueFrom(output)
+      expect(last).toEqual({ id: '1', status: 'filled' })
     })
   })
 }
