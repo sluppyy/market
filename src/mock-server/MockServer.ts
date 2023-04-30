@@ -31,7 +31,7 @@ function randOrder() {
 
 export class MockServer {
   private readonly _orders: Map<string, Order> = groupBy(
-    Array(10).fill(0).map(randOrder),
+    Array(5).fill(0).map(randOrder),
     (order) => order.id
   )
 

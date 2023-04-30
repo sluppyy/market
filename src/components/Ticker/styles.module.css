@@ -1,0 +1,71 @@
+.ticker {
+  padding: 1.5em;
+  border: 1px solid black;
+  width: fit-content;
+  display: grid;
+  grid-template-columns: auto;
+  grid-template-rows: auto auto auto;
+}
+
+.amount {
+  margin: 1em 0;
+}
+
+.instrument, .amount {
+  text-align: center;
+  padding: 0.8em;
+  border-radius: 0px;
+  font-size: 1.3em;
+}
+.instrument:focus, .amount:focus {
+  outline: 0px;
+}
+
+.price-set {
+  display: grid;
+  grid-template-columns: 1fr 16px 1fr;
+  justify-items: center;
+}
+
+.sell > input, .buy input {
+  width: 150px;
+  border-radius: 0;
+  font-size: 1.2em;
+  padding: 0.7em;
+  text-align: center;
+}
+
+.sell, .buy {
+  display: flex;
+  flex-direction: column;
+  row-gap: 1em;
+  align-items: center;
+}
+
+.sell > *, .buy > * {
+  width: fit-content;
+}
+
+.price-set span {
+  border: 1px solid black;
+  width: 0px;
+}
+
+.sell > button, .buy > button {
+  padding: 1em 1.5em;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.sell > button {
+  background-color: #f5222d;
+}
+
+.buy > button {
+  background-color: #73d13d;
+}
+
+.current {
+  font-size: 1.3em;
+}
