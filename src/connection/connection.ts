@@ -36,7 +36,7 @@ export type Message =
 
 export type MessageGetAllOrders = { messageType: MessageType.GetAllOrders }
 export type MessageOrders = {
-  messageType: MessageType.GetAllOrders
+  messageType: MessageType.Orders
   message: {
     id: string
     creationTime: string

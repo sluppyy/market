@@ -3,7 +3,7 @@ export class Order {
     readonly id: string,
     readonly creationTime: Date,
     readonly changeTime: Date,
-    readonly status: 'active' | 'filled' | 'canceled' | 'rejected',
+    readonly status: 'active' | 'filled' | 'cancelled' | 'rejected',
     readonly side: 'buy' | 'sell',
     readonly price: number,
     readonly amount: number,
