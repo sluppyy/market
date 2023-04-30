@@ -1,0 +1,12 @@
+{
+  "moduleFileExtensions": ["ts", "js"],
+  "transform": {
+    "": ["@swc/jest", {
+      "jsc": {
+        "parser": {
+          "syntax": "typescript"
+        }
+      }
+    }]
+  } 
+}
