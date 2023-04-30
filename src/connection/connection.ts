@@ -15,6 +15,9 @@ export enum MessageType {
   GetAllOrders = 1,
   Orders,
 
+  GetMyOrders,
+  MyOrders,
+
   PlaceOrder,
   CancelOrder,
 
@@ -33,6 +36,8 @@ export type Message =
   | MessageSubscribeResult
   | MessageUnsubscribe
   | MessageInstrumentPricesUpdate
+  | MessageGetMyOrders
+  | MessageMyOrders
 
 export type MessageGetAllOrders = { messageType: MessageType.GetAllOrders }
 export type MessageOrders = {
@@ -47,6 +52,13 @@ export type MessageOrders = {
     amount: number
     instrument: string
   }[]
+}
+export type MessageGetMyOrders = {
+  messageType: MessageType.GetMyOrders
+}
+export type MessageMyOrders = {
+  messageType: MessageType.MyOrders
+  message: string[]
 }
 export type MessagePlaceOrder = {
   messageType: MessageType.PlaceOrder

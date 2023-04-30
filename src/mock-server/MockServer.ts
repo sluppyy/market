@@ -28,11 +28,16 @@ function randOrder() {
 }
 
 export class MockServer {
+  private readonly _userOrders = new Set<string>()
+  private readonly _userSubs = new Set<string>()
+
   private readonly _orders: Map<string, Order> = new Map()
   private readonly _priceSubs = new Map<string, string[]>()
+
   //instrument - price
   private readonly _instrumentSellPrices: Map<string, number> = new Map()
   private readonly _instrumentBuyPrices: Map<string, number> = new Map()
+
   private readonly _sellPricesHistory: Map<string, [Date, number][]> = new Map()
   private readonly _buyPricesHistory: Map<string, [Date, number][]> = new Map()
 
@@ -43,6 +48,11 @@ export class MockServer {
   async onMessage(msg: Message) {
     if (msg.messageType == MessageType.GetAllOrders) {
       this._sendOrders([...this._orders.values()])
+    } else if (msg.messageType == MessageType.GetMyOrders) {
+      this.send({
+        messageType: MessageType.MyOrders,
+        message: [...this._userOrders.values()],
+      })
     } else if (msg.messageType == MessageType.PlaceOrder) {
       const now = new Date()
       const order = new Order(
@@ -63,9 +73,11 @@ export class MockServer {
         messageType: MessageType.SubscribeResult,
         message: { type: 'ok', subId: id },
       })
+      this._userSubs.add(id)
       this._notifyPriceSubs(msg.message)
     } else if (msg.messageType == MessageType.Unsubscribe) {
       this._removeSub(msg.message.subId)
+      this._userSubs.delete(msg.message.subId)
     }
   }
 
@@ -139,21 +151,24 @@ export class MockServer {
     const sell = this._instrumentSellPrices.get(instrument) ?? 0
     const buy = this._instrumentBuyPrices.get(instrument) ?? 0
 
-    subs.forEach((_) => {
-      this.send({
-        messageType: MessageType.InstrumentPricesUpdate,
-        message: {
-          instrument,
-          newBuy: buy,
-          newSell: sell,
-        },
+    subs
+      .filter((subId) => this._userSubs.has(subId))
+      .forEach(() => {
+        this.send({
+          messageType: MessageType.InstrumentPricesUpdate,
+          message: {
+            instrument,
+            newBuy: buy,
+            newSell: sell,
+          },
+        })
       })
-    })
   }
 
   private async _onOrderCreated(order: Order) {
     this._sendOrders([order])
     await wait(randInt(0, 4) * 1000)
+    this._userOrders.add(order.id)
 
     const changeTime = new Date()
     if (randInt(0, 2)) {
