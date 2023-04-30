@@ -57,24 +57,7 @@ export class MockServer {
         msg.message.instrument
       )
       this._orders.set(order.id, order)
-      await wait(500)
-      this._sendOrders([order])
-      await wait(randInt(0, 6) * 1000)
-
-      if (randInt(0, 2)) {
-        const filled = order.copy({ status: 'filled' })
-        this._orders.set(filled.id, filled)
-        this._sendOrders([filled])
-
-        const instrument = msg.message.instrument
-        this._setInstrumentSellPrices(instrument, msg.message.price)
-        this._setInstrumentBuyPrices(instrument, msg.message.price)
-        this._notifyPriceSubs(instrument)
-      } else {
-        const rejected = order.copy({ status: 'rejected' })
-        this._orders.set(rejected.id, rejected)
-        this._sendOrders([rejected])
-      }
+      this._onOrderCreated(order)
     } else if (msg.messageType == MessageType.Subscribe) {
       const id = this._addSub(msg.message)
       this.send({
@@ -154,6 +137,27 @@ export class MockServer {
         },
       })
     })
+  }
+
+  private async _onOrderCreated(order: Order) {
+    await wait(500)
+    this._sendOrders([order])
+    await wait(randInt(0, 6) * 1000)
+
+    if (randInt(0, 2)) {
+      const filled = order.copy({ status: 'filled' })
+      this._orders.set(filled.id, filled)
+      this._sendOrders([filled])
+
+      const instrument = order.instrument
+      this._setInstrumentSellPrices(instrument, order.price)
+      this._setInstrumentBuyPrices(instrument, order.price)
+      this._notifyPriceSubs(instrument)
+    } else {
+      const rejected = order.copy({ status: 'rejected' })
+      this._orders.set(rejected.id, rejected)
+      this._sendOrders([rejected])
+    }
   }
 
   addRandom(): void {
