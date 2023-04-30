@@ -73,6 +73,14 @@ export class MockServer {
 
       this._orders.set(order.id, order)
       this._onOrderCreated(order)
+    } else if (msg.messageType == MessageType.CancelOrder) {
+      const order = this._orders.get(msg.message.id)
+      if (!order) return
+
+      const now = new Date()
+      const cancelled = order.copy({ status: 'cancelled', changeTime: now })
+      this._orders.set(cancelled.id, cancelled)
+      this._sendOrders([cancelled])
     } else if (msg.messageType == MessageType.Subscribe) {
       const id = this._addSub(msg.message)
       this.send({
@@ -167,7 +175,9 @@ export class MockServer {
 
   private async _onOrderCreated(order: Order) {
     this._sendOrders([order])
-    await wait(randInt(0, 4) * 1000)
+    await wait(randInt(1, 6) * 1000)
+    order = this._orders.get(order.id)!
+    if (order.status != 'active') return
 
     const changeTime = new Date()
     if (randInt(0, 2)) {

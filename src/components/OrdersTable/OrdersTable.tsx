@@ -2,11 +2,15 @@ import { ReactNode, useMemo, useState } from 'react'
 import { useObservable } from '../../hooks'
 import { OrdersVM } from '../../vm'
 import styles from './styles.module.css'
+import { MyOrdersVM } from '../../vm/MyOrdersVM'
 
 
 export default function OrdersTable() {
   const vm = OrdersVM.use()!
+  const myOrdersVm = MyOrdersVM.use()!
+
   const orders = useObservable(vm.orders$, vm.orders$.value)
+  const myOrders = useObservable(myOrdersVm.myOrders$, myOrdersVm.myOrders$.value)
 
   const [sortField, setSortField] = useState('Id')
   const [sortType, setSortType] = useState('dec')
@@ -89,6 +93,12 @@ export default function OrdersTable() {
           <td>{order.price}</td>
           <td>{order.amount}</td>
           <td>{order.instrument}</td>
+          {myOrders.has(order.id) && order.status == 'active' && 
+            <td><button onClick={() => myOrdersVm.cancelOrder(order.id)}><img
+            src="/icons/cancel.svg"
+            alt="cancel"
+            width={20}
+            height={20}/></button></td>}
         </tr>)}
       </tbody>
     </table>

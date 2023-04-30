@@ -20,7 +20,9 @@ export const getUserOrdersUpdates =
       input.pipe(
         filterOrders(),
         mergeMap((msg) => of(...msg)),
-        filter((order) => order.status != 'active'),
+        filter(
+          (order) => order.status == 'filled' || order.status == 'rejected'
+        ),
         tap((_) => {
           updateReason = 2
         })

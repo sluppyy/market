@@ -1,20 +1,42 @@
+import { BehaviorSubject } from 'rxjs'
 import { Connection, MessageType } from '../connection'
-import { getUserOrdersUpdates } from '../pipes'
+import {
+  filterUserOrders,
+  getUserOrdersUpdates,
+  scanUserOrders,
+} from '../pipes'
 
-export class MyOrdersServer {
-  constructor(connection: Connection) {
-    connection.send({
+export class MyOrdersService {
+  readonly myOrders$: BehaviorSubject<Set<string>> = new BehaviorSubject(
+    new Set()
+  )
+
+  constructor(private readonly _connection: Connection) {
+    _connection.send({
       messageType: MessageType.GetMyOrders,
     })
 
-    connection.messages$
+    _connection.messages$
       .pipe(getUserOrdersUpdates())
       .subscribe(({ id, status }) => {
         this.onOrderStatusUpdate(id, status)
       })
+
+    _connection.messages$
+      .pipe(filterUserOrders(), scanUserOrders())
+      .subscribe(this.myOrders$)
   }
 
   onOrderStatusUpdate(id: string, newStatus: string) {
     alert(`Order ${id} has updated the status to "${newStatus}"`)
+  }
+
+  cancel(id: string) {
+    if (!this.myOrders$.value.has(id)) return
+
+    this._connection.send({
+      messageType: MessageType.CancelOrder,
+      message: { id },
+    })
   }
 }

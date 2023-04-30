@@ -2,20 +2,23 @@ import OrdersTable from "./components/OrdersTable/OrdersTable"
 import TickerGroup from "./components/TickerGroup/TickerGroup"
 import { MockConnection } from "./connection"
 import { MockServer } from "./mock-server"
-import { MyOrdersServer } from "./services"
+import { MyOrdersService } from "./services"
 import { OrdersVM } from "./vm"
+import { MyOrdersVM } from "./vm/MyOrdersVM"
 
 const connection = new MockConnection()
 connection.connect()
 const server = new MockServer(connection)
-const myOrdersServer = new MyOrdersServer(connection)
+const myOrdersService = new MyOrdersService(connection)
 const ordersVm = new OrdersVM(connection)
+const myOrdersVm = new MyOrdersVM(myOrdersService)
 
 Array(5).fill(0).forEach(server.addRandom.bind(server))
 
 function App() {
   return (
   <OrdersVM.Context.Provider value={ordersVm}>
+  <MyOrdersVM.Context.Provider value={myOrdersVm}>
   
   <div className="App">
     <div style={{
@@ -43,6 +46,7 @@ function App() {
     <OrdersTable />  
   </div>
   
+  </MyOrdersVM.Context.Provider>
   </OrdersVM.Context.Provider>)
 }
 
