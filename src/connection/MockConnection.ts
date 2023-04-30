@@ -2,7 +2,7 @@ import { Subject } from 'rxjs'
 import { Connection, Message } from './connection'
 
 export class MockConnection implements Connection {
-  readonly messages$ = new Subject<Message>()
+  messages$ = new Subject<Message>()
   readonly outMessages$ = new Subject<Message>()
 
   private _isConnected = false
@@ -12,10 +12,14 @@ export class MockConnection implements Connection {
 
   connect(): void {
     this._isConnected = true
+    if (this.messages$.closed) {
+      this.messages$ = new Subject()
+    }
   }
 
   disconnect(): void {
     this._isConnected = true
+    this.messages$.complete()
   }
 
   send(message: Message): void {
