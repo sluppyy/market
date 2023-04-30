@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { TickerVM } from '../../vm/TickerVM'
 import styles from './styles.module.css'
 import { useObservable } from '../../hooks'
@@ -14,9 +14,18 @@ export default function Ticker({ onDelete }: Props) {
 
   const marketState = useObservable(vm.marketState$, vm.marketState$.value)
   
-  const [amount, setAmount] = useState(0)
+  const [amount, setAmount] = useState(1000)
   const [sellPrice, setSellPrice] = useState(0)
   const [buyPrice, setBuyPrice] = useState(0)
+
+  useEffect(() => {
+    if (sellPrice == 0) {
+      setSellPrice(marketState.sellOnMarket)
+    }
+    if (buyPrice == 0) {
+      setBuyPrice(marketState.buyOnMarket)
+    }
+  }, [marketState])
 
   function onBuy() {
     if (amount == 0) return
