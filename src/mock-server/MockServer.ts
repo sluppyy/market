@@ -92,17 +92,11 @@ export class MockServer {
   }
 
   private _setInstrumentSellPrices(instrument: string, price: number) {
-    this._instrumentSellPrices.set(
-      instrument,
-      this._instrumentSellPrices.get(instrument) ?? price
-    )
+    this._instrumentSellPrices.set(instrument, price)
   }
 
   private _setInstrumentBuyPrices(instrument: string, price: number) {
-    this._instrumentBuyPrices.set(
-      instrument,
-      this._instrumentBuyPrices.get(instrument) ?? price
-    )
+    this._instrumentBuyPrices.set(instrument, price)
   }
 
   private _addSellPriceToHistory(instrument: string, price: number) {
