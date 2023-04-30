@@ -3,7 +3,11 @@ import { TickerVM } from '../../vm/TickerVM'
 import styles from './styles.module.css'
 import { useObservable } from '../../hooks'
 
-export default function Ticker() {
+interface Props {
+  onDelete?: () => void
+}
+
+export default function Ticker({ onDelete }: Props) {
   const vm = TickerVM.use()!
 
   const marketState = useObservable(vm.marketState$, vm.marketState$.value)
@@ -13,7 +17,10 @@ export default function Ticker() {
 
   return (
     <div className={styles['ticker']}>
-      <h1>{vm.instrument}</h1>
+      <div className={styles['header']}>
+        <h1>{vm.instrument}</h1>
+        <button onClick={onDelete}>Delete</button>
+      </div>
       <input type='number' className={styles['amount']}/>
       <div className={styles['price-set']}>
       

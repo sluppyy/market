@@ -1,0 +1,22 @@
+.add {
+  padding: 0.3em 0.5em;
+  color: white;
+  border: none;
+  font-size: 2em;
+  font-weight: bold;
+  background-color: #73d13d;
+  cursor: pointer;
+}
+
+.container {
+  margin: 1em;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.form input {
+  padding: 0.6em;
+  margin: 8px;
+  font-size: large;
+}

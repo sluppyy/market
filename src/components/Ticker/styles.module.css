@@ -7,6 +7,20 @@
   grid-template-rows: auto auto auto;
 }
 
+.header > * {
+  display: inline;
+  margin: 0 12px;
+}
+
+.header > button {
+  padding: 0.4em;
+  background-color: #f5222d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
 .amount {
   margin: 1em 0;
 }

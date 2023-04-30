@@ -1,5 +1,6 @@
 import OrdersTable from "./components/OrdersTable/OrdersTable"
 import Ticker from "./components/Ticker/Ticker"
+import TickerGroup from "./components/TickerGroup/TickerGroup"
 import { MockConnection } from "./connection"
 import { MockServer } from "./mock-server"
 import { OrdersVM } from "./vm"
@@ -9,12 +10,10 @@ const connection = new MockConnection()
 connection.connect()
 const server = new MockServer(connection)
 const ordersVm = new OrdersVM(connection)
-const tickerVm = new TickerVM(connection)
 
 function App() {
   return (
   <OrdersVM.Context.Provider value={ordersVm}>
-  <TickerVM.Context.Provider value={tickerVm}>
   
   <div className="App">
     <div style={{
@@ -29,13 +28,12 @@ function App() {
     </div>
   
     <div style={{ margin: '1em' }}>
-      <Ticker />
+      <TickerGroup connection={connection}/>
     </div>
   
     <OrdersTable />  
   </div>
   
-  </TickerVM.Context.Provider>
   </OrdersVM.Context.Provider>)
 }
 
