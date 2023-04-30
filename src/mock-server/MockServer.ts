@@ -23,19 +23,18 @@ function randOrder() {
     sides[randInt(0, 2)],
     randInt(500, 3000),
     randInt(1000) * randInt(0, 1000),
-    `instrument ${randInt(0, 5)}`
+    `INS${randInt(0, 5)}`
   )
 }
 
 export class MockServer {
-  private readonly _orders: Map<string, Order> = groupBy(
-    Array(5).fill(0).map(randOrder),
-    (order) => order.id
-  )
+  private readonly _orders: Map<string, Order> = new Map()
   private readonly _priceSubs = new Map<string, string[]>()
   //instrument - price
   private readonly _instrumentSellPrices: Map<string, number> = new Map()
   private readonly _instrumentBuyPrices: Map<string, number> = new Map()
+  private readonly _sellPricesHistory: Map<string, [Date, number][]> = new Map()
+  private readonly _buyPricesHistory: Map<string, [Date, number][]> = new Map()
 
   constructor(private readonly _connection: MockConnection) {
     _connection.outMessages$.subscribe(this.onMessage.bind(this))
@@ -64,6 +63,7 @@ export class MockServer {
         messageType: MessageType.SubscribeResult,
         message: { type: 'ok', subId: id },
       })
+      this._notifyPriceSubs(msg.message)
     } else if (msg.messageType == MessageType.Unsubscribe) {
       this._removeSub(msg.message.subId)
     }
@@ -85,6 +85,18 @@ export class MockServer {
       instrument,
       this._instrumentBuyPrices.get(instrument) ?? price
     )
+  }
+
+  private _addSellPriceToHistory(instrument: string, price: number) {
+    const history = this._sellPricesHistory.get(instrument) ?? []
+    history.push([new Date(), price])
+    this._sellPricesHistory.set(instrument, history)
+  }
+
+  private _addBuyPriceToHistory(instrument: string, price: number) {
+    const history = this._buyPricesHistory.get(instrument) ?? []
+    history.push([new Date(), price])
+    this._buyPricesHistory.set(instrument, history)
   }
 
   private _sendOrders(orders: Order[]) {
@@ -127,7 +139,7 @@ export class MockServer {
     const sell = this._instrumentSellPrices.get(instrument) ?? 0
     const buy = this._instrumentBuyPrices.get(instrument) ?? 0
 
-    subs.forEach((subId) => {
+    subs.forEach((_) => {
       this.send({
         messageType: MessageType.InstrumentPricesUpdate,
         message: {
@@ -140,21 +152,25 @@ export class MockServer {
   }
 
   private async _onOrderCreated(order: Order) {
-    await wait(500)
     this._sendOrders([order])
-    await wait(randInt(0, 6) * 1000)
+    await wait(randInt(0, 4) * 1000)
 
+    const changeTime = new Date()
     if (randInt(0, 2)) {
-      const filled = order.copy({ status: 'filled' })
+      const filled = order.copy({ status: 'filled', changeTime })
       this._orders.set(filled.id, filled)
       this._sendOrders([filled])
 
       const instrument = order.instrument
-      this._setInstrumentSellPrices(instrument, order.price)
-      this._setInstrumentBuyPrices(instrument, order.price)
+
+      this._setInstrumentSellPrices(instrument, order.price - 0.5)
+      this._setInstrumentBuyPrices(instrument, order.price + 0.5)
+      this._addSellPriceToHistory(instrument, order.price - 0.5)
+      this._addBuyPriceToHistory(instrument, order.price + 0.5)
+
       this._notifyPriceSubs(instrument)
     } else {
-      const rejected = order.copy({ status: 'rejected' })
+      const rejected = order.copy({ status: 'rejected', changeTime })
       this._orders.set(rejected.id, rejected)
       this._sendOrders([rejected])
     }
@@ -163,7 +179,7 @@ export class MockServer {
   addRandom(): void {
     const order = randOrder()
     this._orders.set(order.id, order)
-    this._sendOrders([order])
+    this._onOrderCreated(order)
   }
 }
 

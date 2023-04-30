@@ -11,6 +11,8 @@ connection.connect()
 const server = new MockServer(connection)
 const ordersVm = new OrdersVM(connection)
 
+Array(5).fill(0).forEach(server.addRandom.bind(server))
+
 function App() {
   return (
   <OrdersVM.Context.Provider value={ordersVm}>
