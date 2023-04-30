@@ -20,6 +20,7 @@ export class OrdersVM {
         map((map) => [...map.values()])
       )
       .subscribe(this.orders$)
+    _connection.send({ messageType: MessageType.GetAllOrders })
   }
   readonly orders$ = new BehaviorSubject<Order[]>([])
 

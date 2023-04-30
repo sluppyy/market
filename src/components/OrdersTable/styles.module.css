@@ -1,0 +1,41 @@
+.table {
+  font-size: 1.2em;
+}
+
+.table, .table th, .table td {
+  padding: 0.8em;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+.table td:nth-child(1),
+.active, .filled, .rejected, .cancelled 
+.buy, .sell {
+  font-weight: bold;
+}
+
+.table tbody tr {
+  animation: 1s ease-in enter;
+}
+
+.active { color: #73d13d; }
+.filled { color: #4f4f57; }
+.rejected { color: #f5222d; }
+.cancelled { color: #b37feb; }
+
+.buy { color: #73d13d; }
+.sell { color: #f5222d; }
+
+@keyframes enter {
+  from {
+    box-shadow: 0 0 0 #73d13d;
+  }
+
+  50% {
+    box-shadow: 0 0 24px #73d13d;
+  }
+
+  to {
+    box-shadow: 0 0 0 #73d13d;
+  }
+}

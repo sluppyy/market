@@ -60,10 +60,11 @@ describe('vm.orders', () => {
   test('send create and cancel order messages', async () => {
     const connection = new MockConnection()
     connection.connect()
-    const vm = new OrdersVM(connection)
 
     const msgs: Message[] = []
     connection.outMessages$.subscribe(msgs.push.bind(msgs))
+
+    const vm = new OrdersVM(connection)
 
     vm.createOrder({ amount: 1, instrument: 'i', price: 1, side: 'sell' })
     vm.createOrder({ amount: 2, instrument: 'i2', price: 12, side: 'buy' })
@@ -72,6 +73,9 @@ describe('vm.orders', () => {
     await wait(1)
 
     expect(msgs).toEqual([
+      {
+        messageType: MessageType.GetAllOrders,
+      },
       {
         messageType: MessageType.PlaceOrder,
         message: { amount: 1, instrument: 'i', price: 1, side: 'sell' },
