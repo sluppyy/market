@@ -28,6 +28,7 @@ export const getUserOrdersUpdates =
     ]).pipe(
       filter(([ids, order]) => ids.has(order.id)),
       filter((_) => updateReason === 2),
+      tap(console.log),
       map(([_, { id, status }]) => ({
         id,
         status: status as any,

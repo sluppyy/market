@@ -1,14 +1,14 @@
 import OrdersTable from "./components/OrdersTable/OrdersTable"
-import Ticker from "./components/Ticker/Ticker"
 import TickerGroup from "./components/TickerGroup/TickerGroup"
 import { MockConnection } from "./connection"
 import { MockServer } from "./mock-server"
+import { MyOrdersServer } from "./services"
 import { OrdersVM } from "./vm"
-import { TickerVM } from "./vm/TickerVM"
 
 const connection = new MockConnection()
 connection.connect()
 const server = new MockServer(connection)
+const myOrdersServer = new MyOrdersServer(connection)
 const ordersVm = new OrdersVM(connection)
 
 Array(5).fill(0).forEach(server.addRandom.bind(server))

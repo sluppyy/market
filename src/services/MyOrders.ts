@@ -1,9 +1,17 @@
-import { Connection } from '../connection'
-import { filterUserOrders, scanUserOrders } from '../pipes'
+import { Connection, MessageType } from '../connection'
+import { getUserOrdersUpdates } from '../pipes'
 
 export class MyOrdersServer {
-  constructor(private readonly _connection: Connection) {
-    _connection.messages$.pipe(filterUserOrders(), scanUserOrders())
+  constructor(connection: Connection) {
+    connection.send({
+      messageType: MessageType.GetMyOrders,
+    })
+
+    connection.messages$
+      .pipe(getUserOrdersUpdates())
+      .subscribe(({ id, status }) => {
+        this.onOrderStatusUpdate(id, status)
+      })
   }
 
   onOrderStatusUpdate(id: string, newStatus: string) {

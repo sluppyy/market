@@ -65,6 +65,12 @@ export class MockServer {
         msg.message.amount,
         msg.message.instrument
       )
+      this._userOrders.add(order.id)
+      this.send({
+        messageType: MessageType.MyOrders,
+        message: [...this._userOrders.values()],
+      })
+
       this._orders.set(order.id, order)
       this._onOrderCreated(order)
     } else if (msg.messageType == MessageType.Subscribe) {
@@ -168,7 +174,6 @@ export class MockServer {
   private async _onOrderCreated(order: Order) {
     this._sendOrders([order])
     await wait(randInt(0, 4) * 1000)
-    this._userOrders.add(order.id)
 
     const changeTime = new Date()
     if (randInt(0, 2)) {
