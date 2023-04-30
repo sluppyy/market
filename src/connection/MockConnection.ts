@@ -24,15 +24,11 @@ export class MockConnection implements Connection {
 
   send(message: Message): void {
     if (!this._isConnected) return
-    setTimeout(() => {
-      this.outMessages$.next(message)
-    }, 50)
+    this.outMessages$.next(message)
   }
 
   outSend(message: Message) {
     if (!this._isConnected) return
-    setTimeout(() => {
-      this.messages$.next(message)
-    }, 50)
+    this.messages$.next(message)
   }
 }
