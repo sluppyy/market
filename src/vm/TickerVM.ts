@@ -22,11 +22,6 @@ export class TickerVM {
     private readonly _connection: Connection,
     readonly instrument: string
   ) {
-    _connection.send({
-      messageType: MessageType.Subscribe,
-      message: instrument,
-    })
-
     this._instrumentSub = _connection.messages$
       .pipe(filterInstrumentPricesUpdate(instrument))
       .subscribe(({ newBuy, newSell }) =>
@@ -42,6 +37,11 @@ export class TickerVM {
       } else {
         //TODO add error handler
       }
+    })
+
+    _connection.send({
+      messageType: MessageType.Subscribe,
+      message: instrument,
     })
   }
 
