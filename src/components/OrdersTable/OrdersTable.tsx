@@ -1,26 +1,85 @@
+import { ReactNode, useMemo, useState } from 'react'
 import { useObservable } from '../../hooks'
 import { OrdersVM } from '../../vm'
 import styles from './styles.module.css'
+
 
 export default function OrdersTable() {
   const vm = OrdersVM.use()!
   const orders = useObservable(vm.orders$, vm.orders$.value)
 
+  const [sortField, setSortField] = useState('Id')
+  const [sortType, setSortType] = useState('dec')
+
+  const sorted = useMemo(
+    () => [...orders].sort(
+      (a, b) => {
+        const aField = (a as any)[sortField]
+        const bField = (b as any)[sortField]
+
+        return sortType == 'dec' 
+          ? (aField > bField) ? 1 : -1
+          : (aField > bField) ? -1 : 1
+      }
+    ), 
+    [sortField, sortType, orders]
+  )
+  function onFieldClick(field: string) {
+    if (field == sortField) {
+      setSortType(sortType == 'dec' ? 'desc' : 'dec')
+    } else {
+      setSortType('dec')
+      setSortField(field)
+    }
+  }
+
   return (
     <table className={styles['table']}>
       <thead>
         <tr>
-          <th>Id</th>
-          <th>Creation time</th>
-          <th>Change time</th>
-          <th>Status</th>
-          <th>Side</th>
-          <th>Price</th>
-          <th>Amount</th>
-          <th>Instrument</th>
+          <th><ST
+            name='id'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Id</ST></th>
+          <th><ST
+            name='creationTime'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Creation time</ST></th>
+          <th><ST
+            name='changeTime'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Change time</ST></th>
+          <th><ST
+            name='status'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Status</ST></th>
+          <th><ST
+            name='side'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Side</ST></th>
+          <th><ST
+            name='price'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Price</ST></th>
+          <th><ST
+            name='amount'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Amount</ST></th>
+          <th><ST
+            name='instrument'
+            sortField={sortField}
+            sortType={sortType}
+            onClick={onFieldClick}>Instrument</ST></th>
         </tr>
       </thead>
-      <tbody>{orders.map(order => 
+      <tbody>{sorted.map(order => 
         <tr key={order.id}>
           <td>{order.id}</td>
           <td>{order.creationTime.toISOString()}</td>
@@ -34,4 +93,26 @@ export default function OrdersTable() {
       </tbody>
     </table>
   )
+}
+
+interface SortableTitleProps {
+  name: string
+  children: string
+  sortField: string
+  sortType: string
+  onClick: (name: string) => void
+} 
+//SortableTitle
+function ST({ 
+  children, 
+  sortField, 
+  sortType, 
+  onClick,
+  name
+}: SortableTitleProps) {
+  return <span onClick={() => onClick(name)}>{children}{
+    children == sortField 
+      ? ((sortType == 'dec') ? '▾' : '▴')
+      : null
+  }</span>
 }

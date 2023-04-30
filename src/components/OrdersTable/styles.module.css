@@ -8,6 +8,10 @@
   border-collapse: collapse;
 }
 
+.table thead th > span {
+  cursor: pointer;
+}
+
 .table td:nth-child(1),
 .active, .filled, .rejected, .cancelled 
 .buy, .sell {
