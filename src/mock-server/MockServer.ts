@@ -16,25 +16,22 @@ const now = new Date()
 
 const sides = ['buy', 'sell'] as const
 const statuses = ['active', 'filled', 'rejected', 'cancelled'] as const
-const byDefault: Order[] = Array(10)
-  .fill(0)
-  .map(
-    (_) =>
-      new Order(
-        id(),
-        now,
-        now,
-        statuses[randInt(0, 4)],
-        sides[randInt(0, 2)],
-        randInt(500, 3000),
-        randInt(1000) * randInt(0, 1000),
-        `instrument ${randInt(0, 5)}`
-      )
+function randOrder() {
+  return new Order(
+    id(),
+    now,
+    now,
+    statuses[randInt(0, 4)],
+    sides[randInt(0, 2)],
+    randInt(500, 3000),
+    randInt(1000) * randInt(0, 1000),
+    `instrument ${randInt(0, 5)}`
   )
+}
 
 export class MockServer {
   private readonly _orders: Map<string, Order> = groupBy(
-    byDefault,
+    Array(10).fill(0).map(randOrder),
     (order) => order.id
   )
 
@@ -66,5 +63,11 @@ export class MockServer {
         status: order.status,
       })),
     })
+  }
+
+  addRandom(): void {
+    const order = randOrder()
+    this._orders.set(order.id, order)
+    this.sendOrders([order])
   }
 }

@@ -10,11 +10,20 @@ const ordersVm = new OrdersVM(connection)
 
 function App() {
   return (
+  <OrdersVM.Context.Provider value={ordersVm}>
   <div className="App">
-    <OrdersVM.Context.Provider value={ordersVm}>
-      <OrdersTable />  
-    </OrdersVM.Context.Provider>
-  </div>)
+    <div style={{
+      border: '1px solid black',
+      padding: '1em',
+      width: 'fit-content'
+    }}>
+      <h1>Debug</h1>
+      <button onClick={() => server.addRandom()}>Add random order</button>
+    </div>
+    
+    <OrdersTable />  
+  </div>
+  </OrdersVM.Context.Provider>)
 }
 
 export default App
