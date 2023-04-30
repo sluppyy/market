@@ -68,7 +68,7 @@ export type MessageSubscribe = {
   message: string
 }
 export type MessageSubscribeResult = {
-  messageType: MessageType.Subscribe
+  messageType: MessageType.SubscribeResult
   message:
     | {
         type: 'ok'

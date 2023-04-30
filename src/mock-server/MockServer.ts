@@ -12,11 +12,10 @@ function randInt(min = 0, max = 100) {
   return Math.floor(Math.random() * (max - min) + min)
 }
 
-const now = new Date()
-
 const sides = ['buy', 'sell'] as const
 const statuses = ['active', 'filled', 'rejected', 'cancelled'] as const
 function randOrder() {
+  const now = new Date()
   return new Order(
     id(),
     now,

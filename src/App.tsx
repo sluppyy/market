@@ -9,7 +9,7 @@ const connection = new MockConnection()
 connection.connect()
 const server = new MockServer(connection)
 const ordersVm = new OrdersVM(connection)
-const tickerVm = new TickerVM()
+const tickerVm = new TickerVM(connection)
 
 function App() {
   return (

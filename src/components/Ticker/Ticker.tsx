@@ -1,18 +1,19 @@
 import { useState } from 'react'
 import { TickerVM } from '../../vm/TickerVM'
 import styles from './styles.module.css'
+import { useObservable } from '../../hooks'
 
 export default function Ticker() {
   const vm = TickerVM.use()!
 
+  const marketState = useObservable(vm.marketState$, vm.marketState$.value)
+  
   const [sellPrice, setSellPrice] = useState(0)
   const [buyPrice, setBuyPrice] = useState(0)
-  const [sellCurrent, setSellCurrent] = useState(8.89)
-  const [buyCurrent, setBuyCurrent] = useState(8.89)
 
   return (
     <div className={styles['ticker']}>
-      <input className={styles['instrument']} />
+      <h1>{vm.instrument}</h1>
       <input type='number' className={styles['amount']}/>
       <div className={styles['price-set']}>
       
@@ -20,8 +21,8 @@ export default function Ticker() {
           <div
             style={{ cursor: 'pointer' }}
             className={styles['current']}
-            onClick={() => setSellPrice(sellCurrent)}>
-              {sellCurrent}
+            onClick={() => setSellPrice(marketState.sellOnMarket)}>
+              {marketState.sellOnMarket}
           </div>
           <input
             type='number'
@@ -37,8 +38,8 @@ export default function Ticker() {
           <div
             style={{ cursor: 'pointer' }}
             className={styles['current']}
-            onClick={() => setBuyPrice(buyCurrent)}>
-            {buyCurrent}
+            onClick={() => setBuyPrice(marketState.buyOnMarket)}>
+            {marketState.buyOnMarket}
           </div>
           <input
             type='number'
