@@ -27,6 +27,13 @@ function App() {
     >
       <h1>Debug</h1>
       <button onClick={() => server.addRandom()}>Add random order</button>
+      <button onClick={() => {
+        navigator.clipboard
+          .writeText(ordersVm.exportOrdersAsCvs())
+          .then(() => {
+            alert('Table copied to your clipboard')
+          })
+      }}>Export to cvs</button>
     </div>
   
     <div style={{ margin: '1em' }}>

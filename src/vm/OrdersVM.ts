@@ -38,6 +38,22 @@ export class OrdersVM {
     })
   }
 
+  exportOrdersAsCvs() {
+    return this.orders$.value.reduce(
+      (acc, cur) =>
+        acc +
+        `${cur.id},` +
+        `${cur.creationTime.getTime()},` +
+        `${cur.changeTime.getTime()},` +
+        `${cur.status},` +
+        `${cur.side},` +
+        `${cur.price},` +
+        `${cur.amount},` +
+        `${cur.instrument};\n`,
+      ''
+    )
+  }
+
   static Context = createContext<OrdersVM | null>(null)
   static use() {
     return useContext(this.Context)
