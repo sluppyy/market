@@ -4,6 +4,20 @@ import { OrdersVM } from '../../vm'
 import styles from './styles.module.css'
 import { MyOrdersVM } from '../../vm/MyOrdersVM'
 
+function tryParseNumber<T>(value: T): T | Number {
+  return Number(value) || value
+}
+
+function format(date: Date): string {
+  return Intl.DateTimeFormat('en', { 
+    year: 'numeric',
+    day: 'numeric',
+    month: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  }).format(date)
+}
 
 export default function OrdersTable() {
   const vm = OrdersVM.use()!
@@ -18,8 +32,8 @@ export default function OrdersTable() {
   const sorted = useMemo(
     () => [...orders].sort(
       (a, b) => {
-        const aField = (a as any)[sortField]
-        const bField = (b as any)[sortField]
+        const aField = tryParseNumber((a as any)[sortField])
+        const bField = tryParseNumber((b as any)[sortField])
 
         return sortType == 'dec' 
           ? (aField > bField) ? 1 : -1
@@ -86,8 +100,8 @@ export default function OrdersTable() {
       <tbody>{sorted.map(order => 
         <tr key={order.id}>
           <td>{order.id}</td>
-          <td>{order.creationTime.toISOString()}</td>
-          <td>{order.changeTime.toISOString()}</td>
+          <td>{format(order.creationTime)}</td>
+          <td>{format(order.changeTime)}</td>
           <td className={styles[order.status]}>{order.status}</td>
           <td className={styles[order.side]}>{order.side}</td>
           <td>{order.price}</td>
@@ -122,7 +136,7 @@ function ST({
 }: SortableTitleProps) {
   return <span onClick={() => onClick(name)}>{children}{
     name == sortField 
-      ? ((sortType == 'dec') ? '▾' : '▴')
+      ? ((sortType == 'dec') ? ' ▾' : ' ▴')
       : null
   }</span>
 }

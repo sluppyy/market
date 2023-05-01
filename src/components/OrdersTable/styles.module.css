@@ -1,15 +1,44 @@
 .table {
   font-size: 1.2em;
+  border-collapse: collapse;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.table thead th:first-child {
+  border-radius: 8px 0 0 0;
+}
+
+.table thead th:last-child {
+  border-radius: 0 8px 0 0;
 }
 
 .table, .table th, .table td {
-  padding: 0.5em;
-  border: 1px solid black;
-  border-collapse: collapse;
+  padding: 0.5em 0.8em;
+  text-align: center;
 }
 
 .table thead th > span {
   cursor: pointer;
+}
+
+.table thead th {
+  background-color: #362F4B;
+  color: white;
+}
+
+.table tbody tr {
+  color: #565656;
+}
+
+.table tbody tr:nth-child(2n) {
+  background-color: #F5F5F5;
+}
+
+.table tbody td:nth-child(2) {
+  font-size: 0.8em;
+}
+.table tbody td:nth-child(3) {
+  font-size: 0.8em;
 }
 
 .table td:nth-child(1),
