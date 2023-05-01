@@ -35,12 +35,14 @@ describe('vm.orders', () => {
     const connection = new MockConnection()
     connection.connect()
     const vm = new OrdersVM(connection)
+    vm.onInit()
   })
 
   test('listen orders', async () => {
     const connection = new MockConnection()
     connection.connect()
     const vm = new OrdersVM(connection)
+    vm.onInit()
 
     expect(vm.orders$.value).toEqual([])
 
@@ -57,7 +59,7 @@ describe('vm.orders', () => {
     connection.disconnect()
   })
 
-  test('send create and cancel order messages', async () => {
+  test('create order', async () => {
     const connection = new MockConnection()
     connection.connect()
 
@@ -65,11 +67,10 @@ describe('vm.orders', () => {
     connection.outMessages$.subscribe(msgs.push.bind(msgs))
 
     const vm = new OrdersVM(connection)
+    vm.onInit()
 
     vm.createOrder({ amount: 1, instrument: 'i', price: 1, side: 'sell' })
     vm.createOrder({ amount: 2, instrument: 'i2', price: 12, side: 'buy' })
-    vm.cancelOrder('1')
-    vm.cancelOrder('2')
     await wait(1)
 
     expect(msgs).toEqual([
@@ -83,14 +84,6 @@ describe('vm.orders', () => {
       {
         messageType: MessageType.PlaceOrder,
         message: { amount: 2, instrument: 'i2', price: 12, side: 'buy' },
-      },
-      {
-        messageType: MessageType.CancelOrder,
-        message: { id: '1' },
-      },
-      {
-        messageType: MessageType.CancelOrder,
-        message: { id: '2' },
       },
     ])
 

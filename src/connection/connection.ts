@@ -24,7 +24,7 @@ export enum MessageType {
   Subscribe,
   SubscribeResult,
   Unsubscribe,
-  InstrumentPricesUpdate,
+  MarketData,
 }
 
 export type Message =
@@ -35,7 +35,7 @@ export type Message =
   | MessageSubscribe
   | MessageSubscribeResult
   | MessageUnsubscribe
-  | MessageInstrumentPricesUpdate
+  | MessageMarketData
   | MessageGetMyOrders
   | MessageMyOrders
 
@@ -97,8 +97,8 @@ export type MessageUnsubscribe = {
     subId: string
   }
 }
-export type MessageInstrumentPricesUpdate = {
-  messageType: MessageType.InstrumentPricesUpdate
+export type MessageMarketData = {
+  messageType: MessageType.MarketData
   message: {
     instrument: string
     newSell: number

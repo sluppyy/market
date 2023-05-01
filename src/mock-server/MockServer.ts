@@ -163,7 +163,7 @@ export class MockServer {
       .filter((subId) => this._userSubs.has(subId))
       .forEach(() => {
         this.send({
-          messageType: MessageType.InstrumentPricesUpdate,
+          messageType: MessageType.MarketData,
           message: {
             instrument,
             newBuy: buy,

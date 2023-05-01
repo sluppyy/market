@@ -21,6 +21,7 @@ describe('vm.ticker', () => {
     connection.outMessages$.subscribe(msgs.push.bind(msgs))
 
     const vm = new TickerVM(connection, '1')
+    vm.onInit()
     await wait(1)
 
     expect(msgs).toEqual([{ messageType: MessageType.Subscribe, message: '1' }])
@@ -28,11 +29,12 @@ describe('vm.ticker', () => {
 
   test('on new value', async () => {
     const vm = new TickerVM(connection, '1')
+    vm.onInit()
 
     expect(vm.marketState$.value).toEqual({ buyOnMarket: 0, sellOnMarket: 0 })
 
     connection.outSend({
-      messageType: MessageType.InstrumentPricesUpdate,
+      messageType: MessageType.MarketData,
       message: {
         instrument: '1',
         newBuy: 10,
@@ -51,6 +53,7 @@ describe('vm.ticker', () => {
     connection.outMessages$.subscribe(msgs.push.bind(msgs))
 
     const vm = new TickerVM(connection, '1')
+    vm.onInit()
 
     const subId = id()
     expect(msgs).toEqual([{ messageType: MessageType.Subscribe, message: '1' }])
@@ -63,7 +66,7 @@ describe('vm.ticker', () => {
     })
     msgs.pop()
 
-    vm.dispose()
+    vm.onDispose()
     await wait(1)
 
     expect(msgs).toEqual([
