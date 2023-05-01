@@ -36,8 +36,8 @@ export default function OrdersTable() {
         const bField = tryParseNumber((b as any)[sortField])
 
         return sortType == 'dec' 
-          ? (aField > bField) ? 1 : -1
-          : (aField > bField) ? -1 : 1
+          ? (aField > bField) ? -1 : 1
+          : (aField > bField) ? 1 : -1
       }
     ), 
     [sortField, sortType, orders]
