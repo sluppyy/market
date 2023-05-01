@@ -44,7 +44,14 @@ function App() {
       <TickerGroup connection={connection}/>
     </div>
   
-    <OrdersTable />  
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center'
+    }}>
+      <OrdersTable />
+    </div>
   </div>
   
   </VMProvider>
