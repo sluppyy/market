@@ -103,5 +103,6 @@ export type MessageMarketData = {
     instrument: string
     newSell: number
     newBuy: number
+    newPosition: number
   }
 }

@@ -105,6 +105,8 @@ export default function Ticker({ onDelete }: Props) {
         </div>
       
       </div>
+
+      <p className={styles['position']}>Position: {marketState.position}</p>
     </div>
   )
 }

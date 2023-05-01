@@ -1,7 +1,7 @@
 import { Observable, filter, map } from 'rxjs'
 import { Message, MessageMarketData, MessageType } from '../connection'
 
-export const filterInstrumentPricesUpdate =
+export const filterInstrumentDataUpdate =
   (instrument: string) => (input: Observable<Message>) =>
     input.pipe(
       filter(

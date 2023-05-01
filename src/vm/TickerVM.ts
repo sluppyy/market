@@ -1,19 +1,20 @@
 import { createContext, useContext } from 'react'
 import { Connection, MessageType } from '../connection'
 import { BehaviorSubject } from 'rxjs'
-import { filterInstrumentPricesUpdate } from '../pipes/filterInstrumentPricesUpdate'
-import { filterSubscriptionResult } from '../pipes'
+import { filterSubscriptionResult, filterInstrumentDataUpdate } from '../pipes'
 import { ViewModel } from './ViewModel'
 
 interface MarketState {
   buyOnMarket: number
   sellOnMarket: number
+  position: number
 }
 
 export class TickerVM extends ViewModel {
   readonly marketState$ = new BehaviorSubject<MarketState>({
     buyOnMarket: 0,
     sellOnMarket: 0,
+    position: 0,
   })
 
   private _subId?: string
@@ -28,11 +29,12 @@ export class TickerVM extends ViewModel {
   onInit(): void {
     this.addSub(
       this._connection.messages$
-        .pipe(filterInstrumentPricesUpdate(this.instrument))
-        .subscribe(({ newBuy, newSell }) =>
+        .pipe(filterInstrumentDataUpdate(this.instrument))
+        .subscribe(({ newBuy, newSell, newPosition }) =>
           this.marketState$.next({
             buyOnMarket: newBuy,
             sellOnMarket: newSell,
+            position: newPosition,
           })
         )
     )

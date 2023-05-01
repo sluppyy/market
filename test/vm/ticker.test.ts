@@ -31,7 +31,11 @@ describe('vm.ticker', () => {
     const vm = new TickerVM(connection, '1')
     vm.onInit()
 
-    expect(vm.marketState$.value).toEqual({ buyOnMarket: 0, sellOnMarket: 0 })
+    expect(vm.marketState$.value).toEqual({
+      buyOnMarket: 0,
+      sellOnMarket: 0,
+      position: 0,
+    })
 
     connection.outSend({
       messageType: MessageType.MarketData,
@@ -39,12 +43,14 @@ describe('vm.ticker', () => {
         instrument: '1',
         newBuy: 10,
         newSell: 10,
+        newPosition: 1,
       },
     })
     await wait(1)
     expect(vm.marketState$.value).toEqual({
       buyOnMarket: 10,
       sellOnMarket: 10,
+      position: 1,
     })
   })
 

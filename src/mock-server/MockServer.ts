@@ -27,6 +27,12 @@ function randOrder() {
   )
 }
 
+interface InstrumentData {
+  sell: number
+  buy: number
+  position: number
+}
+
 export class MockServer {
   private readonly _userOrders = new Set<string>()
   private readonly _userSubs = new Set<string>()
@@ -35,8 +41,7 @@ export class MockServer {
   private readonly _priceSubs = new Map<string, string[]>()
 
   //instrument - price
-  private readonly _instrumentSellPrices: Map<string, number> = new Map()
-  private readonly _instrumentBuyPrices: Map<string, number> = new Map()
+  private readonly _instrumentsData: Map<string, InstrumentData> = new Map()
 
   private readonly _sellPricesHistory: Map<string, [Date, number][]> = new Map()
   private readonly _buyPricesHistory: Map<string, [Date, number][]> = new Map()
@@ -88,7 +93,7 @@ export class MockServer {
         message: { type: 'ok', subId: id },
       })
       this._userSubs.add(id)
-      this._notifyPriceSubs(msg.message)
+      this._notifyMarketDataSubs(msg.message)
     } else if (msg.messageType == MessageType.Unsubscribe) {
       this._removeSub(msg.message.subId)
       this._userSubs.delete(msg.message.subId)
@@ -99,12 +104,26 @@ export class MockServer {
     this._connection.outSend(msg)
   }
 
+  /**
+   * create if not exists
+   */
+  private _updateInstrumentData(
+    instrument: string,
+    data: Partial<InstrumentData>
+  ) {
+    let cur = this._instrumentsData.get(instrument)
+    if (!cur) cur = { buy: 0, position: 0, sell: 0 }
+
+    const newData = { ...cur, ...data }
+    this._instrumentsData.set(instrument, newData)
+  }
+
   private _setInstrumentSellPrices(instrument: string, price: number) {
-    this._instrumentSellPrices.set(instrument, price)
+    this._updateInstrumentData(instrument, { sell: price })
   }
 
   private _setInstrumentBuyPrices(instrument: string, price: number) {
-    this._instrumentBuyPrices.set(instrument, price)
+    this._updateInstrumentData(instrument, { buy: price })
   }
 
   private _addSellPriceToHistory(instrument: string, price: number) {
@@ -154,10 +173,13 @@ export class MockServer {
     })
   }
 
-  private _notifyPriceSubs(instrument: string) {
+  private _notifyMarketDataSubs(instrument: string) {
     const subs = this._priceSubs.get(instrument) ?? []
-    const sell = this._instrumentSellPrices.get(instrument) ?? 0
-    const buy = this._instrumentBuyPrices.get(instrument) ?? 0
+    const data = this._instrumentsData.get(instrument) ?? {
+      buy: 0,
+      position: 0,
+      sell: 0,
+    }
 
     subs
       .filter((subId) => this._userSubs.has(subId))
@@ -166,8 +188,9 @@ export class MockServer {
           messageType: MessageType.MarketData,
           message: {
             instrument,
-            newBuy: buy,
-            newSell: sell,
+            newBuy: data.buy,
+            newSell: data.sell,
+            newPosition: data.position,
           },
         })
       })
@@ -187,12 +210,17 @@ export class MockServer {
 
       const instrument = order.instrument
 
-      this._setInstrumentSellPrices(instrument, order.price - 0.5)
-      this._setInstrumentBuyPrices(instrument, order.price + 0.5)
+      const cur = this._instrumentsData.get(instrument)
+      this._updateInstrumentData(instrument, {
+        buy: order.price + 0.5,
+        sell: order.price - 0.5,
+        position: cur ? cur.position + 1 : 0,
+      })
+
       this._addSellPriceToHistory(instrument, order.price - 0.5)
       this._addBuyPriceToHistory(instrument, order.price + 0.5)
 
-      this._notifyPriceSubs(instrument)
+      this._notifyMarketDataSubs(instrument)
     } else {
       const rejected = order.copy({ status: 'rejected', changeTime })
       this._orders.set(rejected.id, rejected)
