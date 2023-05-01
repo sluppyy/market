@@ -31,13 +31,6 @@ export class OrdersVM {
     })
   }
 
-  cancelOrder(id: string) {
-    this._connection.send({
-      messageType: MessageType.CancelOrder,
-      message: { id },
-    })
-  }
-
   exportOrdersAsCvs() {
     return this.orders$.value.reduce(
       (acc, cur) =>
