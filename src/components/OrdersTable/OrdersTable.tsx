@@ -121,7 +121,7 @@ function ST({
   name
 }: SortableTitleProps) {
   return <span onClick={() => onClick(name)}>{children}{
-    children == sortField 
+    name == sortField 
       ? ((sortType == 'dec') ? '▾' : '▴')
       : null
   }</span>
