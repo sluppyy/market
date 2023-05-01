@@ -26,7 +26,7 @@ export default function OrdersTable() {
   const orders = useObservable(vm.orders$, vm.orders$.value)
   const myOrders = useObservable(myOrdersVm.myOrders$, myOrdersVm.myOrders$.value)
 
-  const [sortField, setSortField] = useState('Id')
+  const [sortField, setSortField] = useState('id')
   const [sortType, setSortType] = useState('dec')
 
   const sorted = useMemo(
