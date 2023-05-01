@@ -82,6 +82,42 @@ describe('vm.ticker', () => {
       },
     ])
   })
+
+  test('take first sub', async () => {
+    const msgs: Message[] = []
+    connection.outMessages$.subscribe(msgs.push.bind(msgs))
+
+    const vm = new TickerVM(connection, '1')
+    vm.onInit()
+
+    const subId = id()
+    expect(msgs).toEqual([{ messageType: MessageType.Subscribe, message: '1' }])
+    connection.outSend({
+      messageType: MessageType.SubscribeResult,
+      message: {
+        type: 'ok',
+        subId,
+      },
+    })
+    connection.outSend({
+      messageType: MessageType.SubscribeResult,
+      message: {
+        type: 'ok',
+        subId: id(),
+      },
+    })
+    msgs.pop()
+
+    vm.onDispose()
+    await wait(1)
+
+    expect(msgs).toEqual([
+      {
+        messageType: MessageType.Unsubscribe,
+        message: { subId },
+      },
+    ])
+  })
 })
 
 function wait(delay: number) {

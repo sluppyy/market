@@ -1,6 +1,6 @@
 import { createContext, useContext } from 'react'
 import { Connection, MessageType } from '../connection'
-import { BehaviorSubject } from 'rxjs'
+import { BehaviorSubject, take } from 'rxjs'
 import { filterSubscriptionResult, filterInstrumentDataUpdate } from '../pipes'
 import { ViewModel } from './ViewModel'
 
@@ -41,7 +41,7 @@ export class TickerVM extends ViewModel {
 
     this.addSub(
       this._connection.messages$
-        .pipe(filterSubscriptionResult())
+        .pipe(filterSubscriptionResult(), take(1))
         .subscribe((msg) => {
           if (msg.type == 'ok') {
             this._subId = msg.subId
