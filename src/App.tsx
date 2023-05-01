@@ -19,7 +19,7 @@ Array(5).fill(0).forEach(server.addRandom.bind(server))
 function App() {
   return (
   <VMProvider vm={ordersVm} context={OrdersVM.Context}>
-  <MyOrdersVM.Context.Provider value={myOrdersVm}>
+  <VMProvider vm={myOrdersVm} context={MyOrdersVM.Context}>
   
   <div className="App">
     <div style={{
@@ -47,7 +47,7 @@ function App() {
     <OrdersTable />  
   </div>
   
-  </MyOrdersVM.Context.Provider>
+  </VMProvider>
   </VMProvider>)
 }
 

@@ -1,52 +1,62 @@
 import { createContext, useContext } from 'react'
 import { Connection, MessageType } from '../connection'
-import { BehaviorSubject, Subscription, tap } from 'rxjs'
+import { BehaviorSubject } from 'rxjs'
 import { filterInstrumentPricesUpdate } from '../pipes/filterInstrumentPricesUpdate'
 import { filterSubscriptionResult } from '../pipes'
+import { ViewModel } from './ViewModel'
 
 interface MarketState {
   buyOnMarket: number
   sellOnMarket: number
 }
 
-export class TickerVM {
-  readonly marketState$: BehaviorSubject<MarketState> = new BehaviorSubject({
+export class TickerVM extends ViewModel {
+  readonly marketState$ = new BehaviorSubject<MarketState>({
     buyOnMarket: 0,
     sellOnMarket: 0,
   })
 
-  private _instrumentSub?: Subscription
   private _subId?: string
 
   constructor(
     private readonly _connection: Connection,
     readonly instrument: string
   ) {
-    this._instrumentSub = _connection.messages$
-      .pipe(filterInstrumentPricesUpdate(instrument))
-      .subscribe(({ newBuy, newSell }) =>
-        this.marketState$.next({
-          buyOnMarket: newBuy,
-          sellOnMarket: newSell,
+    super()
+  }
+
+  onInit(): void {
+    this.addSub(
+      this._connection.messages$
+        .pipe(filterInstrumentPricesUpdate(this.instrument))
+        .subscribe(({ newBuy, newSell }) =>
+          this.marketState$.next({
+            buyOnMarket: newBuy,
+            sellOnMarket: newSell,
+          })
+        )
+    )
+
+    this.addSub(
+      this._connection.messages$
+        .pipe(filterSubscriptionResult())
+        .subscribe((msg) => {
+          if (msg.type == 'ok') {
+            this._subId = msg.subId
+          } else {
+            //TODO add error handler
+          }
         })
-      )
+    )
 
-    _connection.messages$.pipe(filterSubscriptionResult()).subscribe((msg) => {
-      if (msg.type == 'ok') {
-        this._subId = msg.subId
-      } else {
-        //TODO add error handler
-      }
-    })
-
-    _connection.send({
+    this._connection.send({
       messageType: MessageType.Subscribe,
-      message: instrument,
+      message: this.instrument,
     })
   }
 
-  dispose() {
-    if (this._instrumentSub) this._instrumentSub.unsubscribe()
+  onDispose() {
+    super.onDispose()
 
     if (this._subId)
       this._connection.send({

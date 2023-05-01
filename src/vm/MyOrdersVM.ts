@@ -1,12 +1,14 @@
 import { BehaviorSubject } from 'rxjs'
 import { MyOrdersService } from '../services'
 import { createContext, useContext } from 'react'
+import { ViewModel } from './ViewModel'
 
-export class MyOrdersVM {
-  myOrders$: BehaviorSubject<Set<string>>
+export class MyOrdersVM extends ViewModel {
+  myOrders$ = new BehaviorSubject(new Set<string>())
 
   constructor(private readonly _service: MyOrdersService) {
-    this.myOrders$ = _service.myOrders$
+    super()
+    this.addSub(_service.myOrders$.subscribe(this.myOrders$))
   }
 
   cancelOrder(id: string) {

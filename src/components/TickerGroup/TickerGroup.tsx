@@ -3,6 +3,7 @@ import styles from './styles.module.css'
 import { TickerVM } from '../../vm'
 import Ticker from '../Ticker/Ticker'
 import { Connection } from '../../connection'
+import VMProvider from '../VMProvider/VMProvider'
 
 interface Props {
   connection: Connection
@@ -11,10 +12,6 @@ interface Props {
 export default function TickerGroup({ connection }: Props) {
   const [vms, setVMs] = useState<TickerVM[]>([])
   const [instrument, setInstrument] = useState('')
-  
-  useLayoutEffect(() => {
-    vms.forEach(vm => vm.dispose())
-  }, [connection])
 
   function onAdd() {
     if (instrument == '') return
@@ -31,9 +28,9 @@ export default function TickerGroup({ connection }: Props) {
     <div className={styles['ticker-group']}>
       <div className={styles['container']}>
         {vms.map(vm => 
-          <TickerVM.Context.Provider value={vm} key={vm.instrument}>
+          <VMProvider vm={vm} context={TickerVM.Context} key={vm.instrument}>
             <Ticker onDelete={() => onDelete(vm.instrument)}/>
-          </TickerVM.Context.Provider>
+          </VMProvider>
         )}
       </div>
       
