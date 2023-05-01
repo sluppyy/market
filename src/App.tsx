@@ -1,5 +1,6 @@
 import OrdersTable from "./components/OrdersTable/OrdersTable"
 import TickerGroup from "./components/TickerGroup/TickerGroup"
+import VMProvider from "./components/VMProvider/VMProvider"
 import { MockConnection } from "./connection"
 import { MockServer } from "./mock-server"
 import { MyOrdersService } from "./services"
@@ -17,7 +18,7 @@ Array(5).fill(0).forEach(server.addRandom.bind(server))
 
 function App() {
   return (
-  <OrdersVM.Context.Provider value={ordersVm}>
+  <VMProvider vm={ordersVm} context={OrdersVM.Context}>
   <MyOrdersVM.Context.Provider value={myOrdersVm}>
   
   <div className="App">
@@ -47,7 +48,7 @@ function App() {
   </div>
   
   </MyOrdersVM.Context.Provider>
-  </OrdersVM.Context.Provider>)
+  </VMProvider>)
 }
 
 export default App

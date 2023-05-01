@@ -1,8 +1,9 @@
 import { createContext, useContext } from 'react'
 import { Connection, MessageType } from '../connection'
 import { filterOrders, scanOrders } from '../pipes'
-import { BehaviorSubject, map, tap } from 'rxjs'
+import { BehaviorSubject, map } from 'rxjs'
 import { Order } from '../models'
+import { ViewModel } from './ViewModel'
 
 interface CreateOrder {
   side: 'buy' | 'sell'
@@ -11,18 +12,26 @@ interface CreateOrder {
   instrument: string
 }
 
-export class OrdersVM {
-  constructor(private readonly _connection: Connection) {
-    this._connection.messages$
-      .pipe(
-        filterOrders(),
-        scanOrders(),
-        map((map) => [...map.values()])
-      )
-      .subscribe(this.orders$)
-    _connection.send({ messageType: MessageType.GetAllOrders })
-  }
+export class OrdersVM extends ViewModel {
   readonly orders$ = new BehaviorSubject<Order[]>([])
+
+  constructor(private readonly _connection: Connection) {
+    super()
+  }
+
+  onInit() {
+    this.addSub(
+      this._connection.messages$
+        .pipe(
+          filterOrders(),
+          scanOrders(),
+          map((map) => [...map.values()])
+        )
+        .subscribe(this.orders$)
+    )
+
+    this._connection.send({ messageType: MessageType.GetAllOrders })
+  }
 
   createOrder(data: CreateOrder) {
     this._connection.send({
